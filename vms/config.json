@@ -1,6 +1,6 @@
 {
   "centos8_aarch64": {
-    "enable": true,
+    "enable": false,
     "count": 5,
     "ports": {
       "vm-1": [
@@ -48,7 +48,7 @@
     ]
   },
   "centos7_altarch": {
-    "enable": true,
+    "enable": false,
     "count": 5,
     "ports": {
       "vm-6": [
@@ -92,7 +92,7 @@
     ]
   },
   "centos7_x86_64": {
-    "enable": false,
+    "enable": true,
     "count": 5,
     "ports": {
       "vm-1": [
@@ -139,7 +139,7 @@
     ]
   },
   "ubuntu2004_amd64": {
-    "enable": false,
+    "enable": true,
     "count": 5,
     "ports": {
       "vm-6": [
