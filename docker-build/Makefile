@@ -1,4 +1,4 @@
-HOST_ARCHITECTURE=el8_aarch64 el7_altarch
+HOST_ARCHITECTURE=el7_x86_64 ubuntu2004_amd64
 
 default: build
 
