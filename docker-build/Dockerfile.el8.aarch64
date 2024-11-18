@@ -21,11 +21,20 @@ RUN yum install -y sudo vim lsof wget which vim git iproute net-tools openssh-se
     make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ \
     glibc-headers zlib-devel git-lfs telnet lrzsz jq expat-devel openssl-devel
 
+# 安装必要的语言包和字符映射文件
+RUN yum -y install glibc-common glibc-locale-source glibc-langpack-zh && \
+    yum clean all
+
+# 使用 localedef 生成 zh_CN.UTF-8 locale
+RUN localedef -i zh_CN -c -f UTF-8 -A /usr/share/locale/locale.alias zh_CN.UTF-8
+
+# 设置系统默认 locale
+ENV LANG=zh_CN.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
+
 RUN echo root:sshpass | chpasswd \
         && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-        && chmod u+s $(which ping) \
-        && localedef -i zh_CN -f UTF-8 zh_CN.UTF-8
-ENV LC_ALL=zh_CN.UTF-8
+        && chmod u+s $(which ping)
 
 COPY ./* /docker-build/
 
