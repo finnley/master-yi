@@ -1,0 +1,74 @@
+FROM ubuntu:focal
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list
+RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty main universe restricted multiverse" >>  /etc/apt/sources.list
+
+RUN apt-get update
+RUN apt-get install -y gcc make lsof tzdata perl tar wget sudo systemd ssh psmisc openssh-server vim git iproute2 zsh sqlite3 \
+    hwloc fontconfig sysstat syslog-ng net-tools python python3 libaio-dev libnuma-dev libgcrypt11-dev libncurses5 jq \
+    && sudo apt-get clean all
+RUN apt-get install -y sysv-rc-conf locales
+RUN locale-gen en_US.UTF-8
+# language-pack-zh-hans
+
+RUN echo root:sshpass | chpasswd \
+    && rm /bin/sh \
+    && ln -s /bin/bash /bin/sh \
+    #&& useradd docker && echo docker:sshpass | chpasswd \
+    && sed -i '98adocker    ALL=(ALL)       NOPASSWD:ALL' /etc/sudoers \
+    && echo "actiontech-universe    ALL=(ALL)       NOPASSWD:ALL" >> /etc/sudoers \
+    && echo "PermitRootLogin yes" >> /etc/ssh/sshd_config \
+    && echo 'UseDNS no' >> /etc/ssh/sshd_config \
+    && sed -i '56aDefaults:docker   !requiretty' /etc/sudoers \
+    && sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd \
+    && sed -i 's@\*/10 \* \* \* \* root /usr/lib64/sa/sa1 1 1@*/1 \* \* \* \* root /usr/lib64/sa/sa1 1 1@g' /etc/cron.d/sysstat \
+    && echo "export HISTTIMEFORMAT='%F %T '" >> /etc/bashrc \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && cp /usr/sbin/sysv-rc-conf /usr/sbin/chkconfig
+RUN localedef -i en_US -f UTF-8 en_US.UTF-8
+
+COPY * /docker-build/
+
+# sudoers
+RUN apt-get install -y sudo
+RUN echo "go ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN sed -i "s/Defaults    requiretty/#Defaults    requiretty/g" /etc/sudoers
+
+
+# install git-lfs
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash \
+    && sudo apt-get install git-lfs \
+    && git lfs install
+
+# Docker 安装
+# 参考：https://developer.aliyun.com/mirror/docker-ce?spm=a2c6h.13651102.0.0.4ae91b11pHpBJN&userCode=okjhlpr5
+RUN sudo apt-get update -y
+RUN sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+RUN curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+RUN sudo add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+RUN sudo apt-get -y update
+RUN sudo apt-get -y install docker-ce
+RUN systemctl enable docker
+RUN cat > /etc/docker/daemon.json <<EOF
+{
+    "registry-mirrors": [
+        "https://mirror.ccs.tencentyun.com",
+        "https://docker.mirrors.ustc.edu.cn",
+        "https://vfs1y0dl.mirror.aliyuncs.com",
+        "https://docker.mirrors.ustc.edu.cn",
+        "https://registry.docker-cn.com"
+    ]
+}
+EOF
+
+# git
+RUN git config --global --add safe.directory /universe
+
+# libc
+RUN apt-get install -y libc6
+RUN ln -s /lib/x86_64-linux-gnu/libc.so.6 /lib64/libc.so.6
+
+VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/sbin/init"]
