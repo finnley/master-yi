@@ -88,7 +88,6 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
   # 根据 HOST_ARCHITECTURE 修改配置文件
   # 调用函数并捕获返回值
   enable=$(check_enable)
-  echo ${enable}
 
   if [[ "${enable}" == "true" ]]; then
     # Add template to the file if not already added
