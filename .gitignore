@@ -1,3 +1,4 @@
 # Editor directories and files
 .idea
 .DS_Store
+./docker-vms/docker-compose.yaml

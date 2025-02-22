@@ -18,8 +18,6 @@ fi
 # 脚本最初在 ${COMPOSE_FILE} 中创建或覆盖以 version: '3' 和 x-templates: 开头的内容。
 # Initialize compose file with version and x-templates section
 cat > ${COMPOSE_FILE} <<EOF
-version: '3'
-
 x-templates:
 EOF
 
@@ -108,7 +106,7 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
     networks:
       vm_net:
         ipv4_address: 172.20.30.${container_index}
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.${container_index}" >> ${COMPOSE_FILE}
 
       # 检查并处理端口映射
@@ -120,16 +118,6 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
         done
       fi
 
-#      if [[ $i -eq 1 ]]; then
-#        ## 检查并处理端口映射
-#        if [[ -n "${ports}" ]]; then
-#          echo "    ports:" >> ${COMPOSE_FILE}
-#          for port in ${ports}; do
-#            echo "      - \"${port}\"" >> ${COMPOSE_FILE}
-#          done
-#        fi
-#      fi
-#
       ## 检查并处理卷映射
       if [[ -n "${volumes}" ]]; then
         if [[ "${container_index}" == "1" ]]; then
@@ -153,7 +141,7 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
   fi
 done
 
-# 定义两个网络 vm_net 和 vm_net_2，每个网络分配不同的子网和网关
+# 定义两个网络 vm_net 和 vm_net2，每个网络分配不同的子网和网关
 echo "
 networks:
   vm_net:
@@ -163,7 +151,7 @@ networks:
       config:
         - subnet: 172.20.30.0/24
           gateway: 172.20.30.254
-  vm_net_2:
+  vm_net2:
     driver: bridge
     ipam:
       config:

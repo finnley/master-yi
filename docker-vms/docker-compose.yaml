@@ -1,9 +1,7 @@
-version: '3'
-
 x-templates:
-  agent_centos8_aarch64:
-    &agent_centos8_aarch64
-    image: harbor.einscat.com:10011/library/centos8:aarch64
+  agent_centos7_altarch:
+    &agent_centos7_altarch
+    image: harbor.einscat.com:10011/library/centos7:altarch
     privileged: true
     stdin_open: true
     tty: true
@@ -15,9 +13,9 @@ x-templates:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - ~/workspace:/root/workspace
-  agent_centos7_altarch:
-    &agent_centos7_altarch
-    image: harbor.einscat.com:10011/library/centos7:altarch
+  agent_centos8_aarch64:
+    &agent_centos8_aarch64
+    image: harbor.einscat.com:10011/library/centos8:aarch64
     privileged: true
     stdin_open: true
     tty: true
@@ -38,20 +36,18 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.1
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.1
     ports:
-      - "3306:3306"
-      - "6379:6379"
-      - "20000:10000"
+      - "13306:3306"
+      - "16379:6379"
+      - "10001:10000"
       - "20001:18080"
       - "20002:27001"
-      - "20003:3306"
-      - "16379:6379"
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
       - "~/workspace:/root/workspace"
-    <<: *agent_centos8_aarch64
+    <<: *agent_centos7_altarch
 
   vm-2:
     container_name: vm-2
@@ -59,16 +55,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.2
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.2
     ports:
-      - "3307:3306"
-      - "6380:6379"
-      - "20004:10000"
-      - "20005:18080"
-      - "20006:27001"
-      - "20007:3306"
-    <<: *agent_centos8_aarch64
+      - "13307:3306"
+      - "16380:6379"
+    <<: *agent_centos7_altarch
 
   vm-3:
     container_name: vm-3
@@ -76,15 +68,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.3
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.3
     ports:
-      - "3308:3306"
-      - "6381:6379"
-      - "20009:18080"
-      - "20010:27001"
-      - "20011:3306"
-    <<: *agent_centos8_aarch64
+      - "13308:3306"
+      - "16381:6379"
+    <<: *agent_centos7_altarch
 
   vm-4:
     container_name: vm-4
@@ -92,15 +81,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.4
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.4
     ports:
-      - "3309:3306"
-      - "6382:6379"
-      - "20012:10000"
-      - "20013:18080"
-      - "20014:27001"
-    <<: *agent_centos8_aarch64
+      - "13309:3306"
+      - "16382:6379"
+    <<: *agent_centos7_altarch
 
   vm-5:
     container_name: vm-5
@@ -108,15 +94,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.5
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.5
     ports:
-      - "3310:3306"
-      - "6383:6379"
-      - "20016:10000"
-      - "20017:18080"
-      - "20018:27001"
-    <<: *agent_centos8_aarch64
+      - "13310:3306"
+      - "16383:6379"
+    <<: *agent_centos7_altarch
 
   vm-6:
     container_name: vm-6
@@ -124,15 +107,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.6
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.6
     ports:
-      - "3311:3306"
-      - "20020:10000"
-      - "20021:18080"
-      - "20022:27001"
-      - "6384:6379"
-    <<: *agent_centos7_altarch
+      - "13311:3306"
+      - "16384:6379"
+    <<: *agent_centos8_aarch64
 
   vm-7:
     container_name: vm-7
@@ -140,15 +120,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.7
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.7
     ports:
-      - "3312:3306"
-      - "20024:10000"
-      - "20025:18080"
-      - "20026:27001"
-      - "6385:6379"
-    <<: *agent_centos7_altarch
+      - "13312:3306"
+      - "16385:6379"
+    <<: *agent_centos8_aarch64
 
   vm-8:
     container_name: vm-8
@@ -156,15 +133,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.8
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.8
     ports:
-      - "3313:3306"
-      - "20028:10000"
-      - "20029:18080"
-      - "20030:27001"
-      - "6386:6379"
-    <<: *agent_centos7_altarch
+      - "13313:3306"
+      - "16386:6379"
+    <<: *agent_centos8_aarch64
 
   vm-9:
     container_name: vm-9
@@ -172,15 +146,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.9
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.9
     ports:
-      - "3314:3306"
-      - "6387:6379"
-      - "20032:10000"
-      - "20033:18080"
-      - "20034:27001"
-    <<: *agent_centos7_altarch
+      - "13314:3306"
+      - "16387:6379"
+    <<: *agent_centos8_aarch64
 
   vm-10:
     container_name: vm-10
@@ -188,15 +159,12 @@ services:
     networks:
       vm_net:
         ipv4_address: 172.20.30.10
-      vm_net_2:
+      vm_net2:
         ipv4_address: 172.20.40.10
     ports:
-      - "3315:3306"
-      - "6388:6379"
-      - "20036:10000"
-      - "20037:18080"
-      - "20038:27001"
-    <<: *agent_centos7_altarch
+      - "13315:3306"
+      - "16388:6379"
+    <<: *agent_centos8_aarch64
 
 networks:
   vm_net:
@@ -206,7 +174,7 @@ networks:
       config:
         - subnet: 172.20.30.0/24
           gateway: 172.20.30.254
-  vm_net_2:
+  vm_net2:
     driver: bridge
     ipam:
       config:
