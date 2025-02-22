@@ -24,9 +24,9 @@ RUN yum install -y sudo vim lsof wget which vim git iproute net-tools openssh-se
 
 RUN echo root:sshpass | chpasswd \
         && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-        && chmod u+s $(which ping) \
-        && localedef -i zh_CN -f UTF-8 zh_CN.UTF-8
-ENV LC_ALL=zh_CN.UTF-8
+        && chmod u+s $(which ping)
+#        && localedef -i zh_CN -f UTF-8 zh_CN.UTF-8
+# ENV LC_ALL=zh_CN.UTF-8
 
 COPY ./* /docker-build/
 
