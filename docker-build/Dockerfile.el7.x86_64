@@ -15,6 +15,7 @@ RUN yum install -y tcl
 # 常用工具
 # openssh-server: sshd
 RUN yum install -y sudo vim lsof wget which vim git iproute net-tools openssh-server openssl openssl-devel \
+        vixie-cron crontabs \
         make autoconf automake cmake gcc gcc-c++ \
         zlib zlib-devel \
         && yum clean all
