@@ -1,4 +1,20 @@
-# vms
+# docker-vms
+
+## 使用
+
+1. 使用本地环境（默认）：
+
+```bash
+make prepare
+# 或者显式指定
+make prepare ENV_TYPE=local
+```
+
+2. 使用测试环境：
+
+```bash
+make prepare ENV_TYPE=test
+```
 
 ## docker-compose.yaml
 

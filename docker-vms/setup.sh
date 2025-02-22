@@ -47,6 +47,30 @@ contains_element() {
 # Initialize an array to track added templates
 templates=()
 
+# 定义函数
+check_enable() {
+    local enable=false  # 默认值设为 false
+
+    if [[ "${HOST_ARCHITECTURE}" == "x64" ]]; then
+        if [[ "${key}" == "centos7_x86_64" || "${key}" == "ubuntu2004_amd64" ]]; then
+            enable=true
+        fi
+    elif [[ "${HOST_ARCHITECTURE}" == "arm64" ]]; then
+        if [[ "${key}" == "centos7_altarch" || "${key}" == "centos8_aarch64" ]]; then
+            enable=true
+        fi
+    else
+        echo "Invalid HOST_ARCHITECTURE: ${HOST_ARCHITECTURE}. Must be 'x64' or 'arm64'"
+        return 1  # 返回非零值表示出错
+    fi
+
+    if [[ "$enable" == true ]]; then
+        echo "true"  # 输出 true
+    else
+        echo "false"  # 输出 false
+    fi
+}
+
 # 读取 config.json 文件中的每个条目，检查是否启用（enable 字段为 true）。
 # 找到启用的模板后，将其添加到 docker-compose.yaml 的 x-templates 部分，如果未添加过则进行处理。
 # 使用 yq 命令从模板文件中提取模板内容加入构建的 docker-compose.yaml。
@@ -54,8 +78,17 @@ templates=()
 jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
   key=$(echo "${entry}" | jq -r '.key')
   value=$(echo "${entry}" | jq -r '.value')
-  enable=$(echo "${value}" | jq -r '.enable')
+  # enable=$(echo "${value}" | jq -r '.enable')
   template="agent_$(to_lowercase ${key})"
+
+  # 根据 .env 文件中的 HOST_ARCHITECTURE 来设置config.json文件的中enable
+  # 比如，HOST_ARCHITECTURE==local，表示当前环境为我本地的 MacOS arm64，
+  # 则将 centos7_altarch 和 centos8_aarch64 的 enable 值设置true，因为我本地仅只是这两个架构，
+  # 反之则将另外两个设置为true
+  # 根据 HOST_ARCHITECTURE 修改配置文件
+  # 调用函数并捕获返回值
+  enable=$(check_enable)
+  echo ${enable}
 
   if [[ "${enable}" == "true" ]]; then
     # Add template to the file if not already added
@@ -86,7 +119,9 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
   key=$(echo "${entry}" | jq -r '.key')
   value=$(echo "${entry}" | jq -r '.value')
 
-  enable=$(echo "${value}" | jq -r '.enable')
+  # enable=$(echo "${value}" | jq -r '.enable')
+  # 调用函数并捕获返回值
+  enable=$(check_enable)
   count=$(echo "${value}" | jq -r '.count')
 
 #  ports=$(echo "${value}" | jq -r '.ports[]')
