@@ -1,0 +1,34 @@
+# 基础镜像
+FROM centos:centos8.4.2105
+
+# 设置镜像源
+# 参考：https://www.cnblogs.com/xiaochouk/p/16735341.html
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+RUN yum makecache
+RUN yum -y update
+
+# MySQL 依赖
+RUN yum install -y libaio numactl perl
+
+# 常用工具
+# openssh-server: sshd
+# tcl: redis 依赖，在执行make test 提示 You need tcl 8.5 or newer in order to run the Redis test
+RUN yum install -y tcl
+
+# policycoreutils: setenforce 0
+RUN yum install -y sudo vim lsof wget which vim git iproute net-tools openssh-server passwd policycoreutils man-db \
+    make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ \
+    glibc-headers zlib-devel git-lfs telnet lrzsz jq expat-devel openssl-devel \
+    zlib zlib-devel
+
+RUN echo root:sshpass | chpasswd \
+        && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+        && chmod u+s $(which ping) \
+        && localedef -i zh_CN -f UTF-8 zh_CN.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
+
+COPY ./* /docker-build/
+
+VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/usr/sbin/init"]

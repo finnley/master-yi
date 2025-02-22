@@ -1,0 +1,57 @@
+# 基础镜像
+FROM centos:centos7.9.2009
+
+# 设置镜像源
+# 参考：https://developer.aliyun.com/mirror/centos-altarch?spm=a2c6h.13651102.0.0.534d1b11CbZMrv
+RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup \
+        && curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-altarch-7.repo \
+        && yum clean all \
+        && yum makecache
+
+# MySQL 依赖
+RUN yum install -y libaio numactl perl
+
+# Redis 依赖
+# tcl: redis 依赖，在执行make test 提示 You need tcl 8.5 or newer in order to run the Redis test
+RUN yum install -y tcl
+
+# 常用工具
+# openssh-server: sshd
+RUN yum install -y sudo vim lsof wget which vim git iproute net-tools openssh-server openssl openssl-devel \
+        make autoconf automake cmake gcc gcc-c++ \
+        zlib zlib-devel \
+        && yum clean all
+
+RUN echo root:sshpass | chpasswd \
+        && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+        && chmod u+s $(which ping) \
+        && localedef -i zh_CN -f UTF-8 zh_CN.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
+
+# Docker 安装
+# 参考：https://developer.aliyun.com/mirror/docker-ce?spm=a2c6h.13651102.0.0.4ae91b11pHpBJN&userCode=okjhlpr5
+RUN sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+RUN sudo yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+RUN sudo sed -i 's+download.docker.com+mirrors.aliyun.com/docker-ce+' /etc/yum.repos.d/docker-ce.repo
+RUN sudo yum makecache fast
+RUN sudo yum -y install docker-ce
+RUN systemctl enable docker
+RUN cat > /etc/docker/daemon.json <<EOF
+{
+    "registry-mirrors": [
+        "https://mirror.ccs.tencentyun.com",
+        "https://docker.mirrors.ustc.edu.cn",
+        "https://vfs1y0dl.mirror.aliyuncs.com",
+        "https://docker.mirrors.ustc.edu.cn",
+        "https://registry.docker-cn.com"
+    ]
+}
+EOF
+# 启动容器后需要手动启动docker
+# RUN systemctl daemon-reload && systemctl restart docker
+# RUN systemctl start docker
+
+COPY ./* /docker-build/
+
+VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/usr/sbin/init"]
