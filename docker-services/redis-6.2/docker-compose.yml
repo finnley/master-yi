@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  #--------------------------------------------------------------------------
+  # Redis
+  #--------------------------------------------------------------------------
+  redis-6.2:
+    image: "redis:${REDIS_VERSION}-alpine"
+    container_name: redis-6.2
+    build:
+      context: ./
+      args:
+        - REDIS_VERSION=${REDIS_VERSION}
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - ${DATA_PATH_HOST}/redis/6.2/data:/data
+    restart: always
+    networks:
+      - backend
+  
+networks:
+  frontend:
+    driver: ${NETWORKS_DRIVER}
+  backend:
+    driver: ${NETWORKS_DRIVER}
