@@ -47,7 +47,7 @@
       ]
     },
     "volumes": [
-      "/opt/shared:/opt/shared"
+      "~/shared:/opt/shared"
     ]
   },
   "ubuntu2004_amd64": {
@@ -75,7 +75,7 @@
       ]
     },
     "volumes": [
-      "/opt/shared:/opt/shared"
+      "~/shared:/opt/shared"
     ]
   },
   "centos7_altarch": {
